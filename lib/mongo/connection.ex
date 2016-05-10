@@ -18,6 +18,7 @@ defmodule Mongo.Connection do
   @find_one_flags ~w(slave_ok exhaust partial)a
   @find_flags ~w(tailable_cursor slave_ok no_cursor_timeout await_data exhaust allow_partial_results)a
   @update_flags ~w(upsert multi)a
+  @timeout 5000
 
   @doc """
   Starts the connection process.
@@ -56,28 +57,28 @@ defmodule Mongo.Connection do
 
   @doc false
   def find(conn, coll, query, select, opts \\ []) do
-    GenServer.call(conn, {:find, coll, query, select, opts})
+    GenServer.call(conn, {:find, coll, query, select, opts}, Keyword.get(opts, :timeout, @timeout))
   end
 
   @doc false
   def get_more(conn, coll, cursor_id, opts \\ []) do
-    GenServer.call(conn, {:get_more, coll, cursor_id, opts})
+    GenServer.call(conn, {:get_more, coll, cursor_id, opts}, Keyword.get(opts, :timeout, @timeout))
   end
 
   @doc false
   def kill_cursors(conn, cursor_ids) do
-    GenServer.call(conn, {:kill_cursors, List.wrap(cursor_ids)})
+    GenServer.call(conn, {:kill_cursors, List.wrap(cursor_ids)}, Keyword.get(opts, :timeout, @timeout))
   end
 
   @doc false
   def find_one(conn, coll, query, select, opts \\ []) do
-    GenServer.call(conn, {:find_one, coll, query, select, opts})
+    GenServer.call(conn, {:find_one, coll, query, select, opts}, Keyword.get(opts, :timeout, @timeout))
   end
 
   @doc false
   def insert(conn, coll, docs, opts \\ []) do
     {ids, docs} = assign_ids(docs)
-    case GenServer.call(conn, {:insert, coll, docs, opts}) do
+    case GenServer.call(conn, {:insert, coll, docs, opts}, Keyword.get(opts, :timeout, @timeout)) do
       {:ok, result} -> {:ok, %{result | inserted_ids: ids}}
       other -> other
     end
@@ -85,12 +86,12 @@ defmodule Mongo.Connection do
 
   @doc false
   def update(conn, coll, query, update, opts \\ []) do
-    GenServer.call(conn, {:update, coll, query, update, opts})
+    GenServer.call(conn, {:update, coll, query, update, opts}, Keyword.get(opts, :timeout, @timeout))
   end
 
   @doc false
   def remove(conn, coll, query, opts \\ []) do
-    GenServer.call(conn, {:remove , coll, query, opts})
+    GenServer.call(conn, {:remove , coll, query, opts}, Keyword.get(opts, :timeout, @timeout))
   end
 
   @doc false
