@@ -67,7 +67,7 @@ defmodule Mongo.Connection do
 
   @doc false
   def kill_cursors(conn, cursor_ids) do
-    GenServer.call(conn, {:kill_cursors, List.wrap(cursor_ids)}, Keyword.get(opts, :timeout, @timeout))
+    GenServer.call(conn, {:kill_cursors, List.wrap(cursor_ids)})
   end
 
   @doc false
